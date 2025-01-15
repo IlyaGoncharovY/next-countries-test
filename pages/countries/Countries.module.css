@@ -1,0 +1,15 @@
+.countriesContainer {
+    padding: 20px;
+    font-family: Arial, sans-serif;
+
+    .countriesContainerTitle {
+        text-align: center;
+    }
+
+    .countriesList {
+        list-style: none;
+        padding: 0;
+        margin: 20px auto;
+        max-width: 600px;
+    }
+}
