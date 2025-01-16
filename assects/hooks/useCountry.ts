@@ -1,34 +1,36 @@
+import {useRouter} from "next/router";
 import {useEffect, useState} from "react";
+import {ICountry} from "@/assects/hooks/useCountries";
 
-export interface ICountry {
-    flag_url : string,
-    "name_ru" : string,
-    "iso_code2" : string,
-    "iso_code3" : string
-}
+export const useCountry = (iso_code2: string | string[] | undefined, fetchCountries?: () => Promise<ICountry[]>) => {
 
-export const useCountry = (fetchCountries: () => Promise<ICountry[]>) => {
-    const [countryList, setCountryList] = useState<ICountry[]>([]);
+    const router = useRouter();
 
-    const removeCountry = (code: string) => {
-        setCountryList((prev) => prev.filter((country) => country.iso_code2!== code));
-    };
+    const [country, setCountry] = useState<ICountry | null>(null);
 
     useEffect(() => {
-        const loadCountries = async () => {
+        if (!fetchCountries) return;
+        const loadCountry = async () => {
             try {
                 const countries = await fetchCountries();
-                setCountryList(countries);
+                const foundCountry = countries.find((c) => c.iso_code2 === iso_code2);
+                setCountry(foundCountry || null);
             } catch (error) {
                 console.error('Error fetching countries:', error);
             }
         };
 
-        loadCountries();
-    }, []);
+        if (iso_code2) {
+            loadCountry();
+        }
+    }, [fetchCountries, iso_code2]);
+
+    const handleItemClick = () => {
+        router.push(`/countries/item/${iso_code2}`);
+    };
 
     return {
-        countryList,
-        removeCountry,
+        country,
+        handleItemClick
     }
 };
