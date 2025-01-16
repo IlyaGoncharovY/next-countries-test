@@ -48,7 +48,7 @@ function Countries() {
             </ul>
         </>
     );
-};
+}
 
 Countries.getLayout = getLayout;
 export default Countries;
