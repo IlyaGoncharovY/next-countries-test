@@ -1,0 +1,8 @@
+.navbarContainer {
+    display: flex;
+    column-gap: 20px;
+
+    & a:hover {
+        color: #4b9e9e;
+    }
+}
