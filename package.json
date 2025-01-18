@@ -2,11 +2,13 @@
   "name": "next-countries-test",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "npx eslint .",
+    "style-lint": "npx stylelint '**/*.scss' '**/*.css'"
   },
   "dependencies": {
     "framer-motion": "^11.18.0",
@@ -16,6 +18,8 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
+    "@ilya_goncharov_y/custom-stylelint": "^1.0.9",
+    "@ilya_goncharov_y/customeslint": "^1.0.10",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
