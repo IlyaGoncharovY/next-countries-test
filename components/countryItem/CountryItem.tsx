@@ -43,7 +43,7 @@ export const CountryItem: FC<ICountryItem> = ({
   const {handleItemClick} = useCountry(country.iso_code2);
 
   const basePath = publicRuntimeConfig?.basePath || '';
-  const defaultFlagUrl = '/globe.svg';
+  const defaultFlagUrl = `${basePath}/globe.svg`;
 
   const [currentFlagUrl, setCurrentFlagUrl] = useState<string>(
     country.flag_url ? `https:${country.flag_url}` : defaultFlagUrl,
@@ -57,6 +57,8 @@ export const CountryItem: FC<ICountryItem> = ({
     removeCountry(country.iso_code2);
   };
 
+  const isExternalUrl = (url: string) => url.startsWith('https://') || url.startsWith('http://');
+
   return (
     <motion.li
       initial={{opacity: 0, x: 100}}
@@ -66,14 +68,25 @@ export const CountryItem: FC<ICountryItem> = ({
       className={s.countryItemContainer}
       onClick={handleItemClick}
     >
-      <Image
-        src={`${basePath}${currentFlagUrl}`}
-        alt={`Country name: ${country.name_ru}`}
-        width={40}
-        height={30}
-        className={s.countryItemFlag}
-        onError={handleImageError}
-      />
+      {isExternalUrl(currentFlagUrl) ? (
+        <img
+          src={currentFlagUrl}
+          alt={`Country name: ${country.name_ru}`}
+          width={40}
+          height={30}
+          className={s.countryItemFlag}
+          onError={handleImageError}
+        />
+      ) : (
+        <Image
+          src={currentFlagUrl}
+          alt={`Country name: ${country.name_ru}`}
+          width={40}
+          height={30}
+          className={s.countryItemFlag}
+          onError={handleImageError}
+        />
+      )}
       <span
         className={s.countryItemName}
       >{country.name_ru}</span>
