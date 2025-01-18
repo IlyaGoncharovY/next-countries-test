@@ -4,6 +4,8 @@ import Image from 'next/image';
 import {motion} from 'framer-motion';
 import {useRouter} from 'next/router';
 
+import {SyntheticEvent} from 'react';
+
 import s from './CountryDetails.module.css';
 
 import {ICountry} from '@/assects/types/types';
@@ -49,6 +51,11 @@ const CountryDetails = ({ country }: CountryDetailsProps) => {
   const router = useRouter();
   const defaultFlagUrl = '/globe.svg';
 
+  const backPageHandler = () => router.back();
+  const onErrorHandler = (e: SyntheticEvent<HTMLImageElement, Event>) => {
+    return  e.currentTarget.src = defaultFlagUrl;
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, x: -200 }}
@@ -63,10 +70,10 @@ const CountryDetails = ({ country }: CountryDetailsProps) => {
         width={40}
         height={30}
         className={s.countryFlag}
-        onError={(e) => (e.currentTarget.src = defaultFlagUrl)}
+        onError={onErrorHandler}
       />
       <span className={s.countryName}>{country.name_ru}</span>
-      <button onClick={() => router.back()} className={s.backButton}>
+      <button onClick={backPageHandler} className={s.backButton}>
                 Back
       </button>
     </motion.div>

@@ -17,7 +17,8 @@ interface ICountryItem {
  * Компонент для отображения элемента списка стран.
  *
  * @param {ICountry} country - Объект, содержащий данные о стране, такие как название, флаг и коды ISO.
- * @param {function} removeCountry - Функция для удаления страны из списка. Принимает код страны (ISO 3166-1 alpha-2) в качестве аргумента.
+ * @param {function} removeCountry - Функция для удаления страны из списка. Принимает код страны (ISO 3166-1 alpha-2)
+ * в качестве аргумента.
  *
  * @example
  * const country = {

@@ -1,6 +1,5 @@
-import {useState} from 'react';
+import {useEffect} from 'react';
 import {GetStaticProps} from 'next';
-
 import {AnimatePresence} from 'framer-motion';
 
 import s from './Countries.module.css';
@@ -10,25 +9,17 @@ import {CountryAPI} from '@/assects/api/CountryAPI';
 import {getLayout} from '@/components/layout/Layout';
 import {HeadMeta} from '@/components/headMeta/HeadMeta';
 import {CountryItem} from '@/components/countryItem/CountryItem';
-
+import {useCountriesContext} from '@/contexts/CountriesContext';
 
 export const getStaticProps: GetStaticProps = async () => {
-  try {
-    const initialCountryList: ICountry[] = await CountryAPI.fetchCountries();
 
-    return {
-      props: {
-        initialCountryList,
-      },
-    };
-  } catch (error) {
-    console.error('Failed to fetch countries:', error);
-    return {
-      props: {
-        initialCountryList: [],
-      },
-    };
-  }
+  const initialCountryList: ICountry[] = await CountryAPI.fetchCountries();
+
+  return {
+    props: {
+      initialCountryList,
+    },
+  };
 };
 
 interface CountriesProps {
@@ -37,10 +28,19 @@ interface CountriesProps {
 
 const Countries = ({initialCountryList}: CountriesProps ) => {
 
-  const [countryList, setCountryList] = useState<ICountry[]>(initialCountryList);
+  const {countryList, setCountryList} = useCountriesContext();
+
+  useEffect(() => {
+    if (!countryList) {
+      setCountryList(initialCountryList);
+    }
+  }, [countryList, initialCountryList, setCountryList]);
 
   const removeCountry = (code: string) => {
-    setCountryList((prev) => prev.filter((country) => country.iso_code2 !== code));
+    setCountryList((prev) => {
+      if (!prev) return prev;
+      return prev.filter((country) => country.iso_code2 !== code);
+    });
   };
 
   return (
