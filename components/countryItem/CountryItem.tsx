@@ -1,12 +1,14 @@
 import React, {FC, useState} from 'react';
 import Image from 'next/image';
 import {motion} from 'framer-motion';
+import getConfig from 'next/config';
 
 import s from './CountryItem.module.css';
 
 import {ICountry} from '@/assects/types/types';
 import {useCountry} from '@/assects/hooks/useCountry';
 
+const { publicRuntimeConfig } = getConfig();
 
 interface ICountryItem {
     country: ICountry
@@ -40,7 +42,9 @@ export const CountryItem: FC<ICountryItem> = ({
 }: ICountryItem) => {
   const {handleItemClick} = useCountry(country.iso_code2);
 
+  const basePath = publicRuntimeConfig?.basePath || '';
   const defaultFlagUrl = '/globe.svg';
+
   const [currentFlagUrl, setCurrentFlagUrl] = useState<string>(
     country.flag_url ? `https:${country.flag_url}` : defaultFlagUrl,
   );
@@ -63,7 +67,7 @@ export const CountryItem: FC<ICountryItem> = ({
       onClick={handleItemClick}
     >
       <Image
-        src={currentFlagUrl}
+        src={`${basePath}${currentFlagUrl}`}
         alt={`Country name: ${country.name_ru}`}
         width={40}
         height={30}
