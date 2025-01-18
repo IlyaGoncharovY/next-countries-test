@@ -1,4 +1,4 @@
-import React, {FC, useState} from 'react';
+import React, {FC, useEffect, useState} from 'react';
 import Image from 'next/image';
 import {motion} from 'framer-motion';
 import getConfig from 'next/config';
@@ -44,10 +44,20 @@ export const CountryItem: FC<ICountryItem> = ({
 
   const basePath = publicRuntimeConfig?.basePath || '';
   const defaultFlagUrl = `${basePath}/globe.svg`;
+  const isExternalUrl = (url: string) => url.startsWith('https://') || url.startsWith('http://');
 
   const [currentFlagUrl, setCurrentFlagUrl] = useState<string>(
     country.flag_url ? `https:${country.flag_url}` : defaultFlagUrl,
   );
+
+  useEffect(() => {
+    if (country.flag_url) {
+      setCurrentFlagUrl(`https:${country.flag_url}`);
+    } else {
+      setCurrentFlagUrl(defaultFlagUrl);
+    }
+  }, [country.flag_url, defaultFlagUrl]);
+
   const handleImageError = () => {
     setCurrentFlagUrl(defaultFlagUrl);
   };
@@ -56,8 +66,6 @@ export const CountryItem: FC<ICountryItem> = ({
     e.stopPropagation();
     removeCountry(country.iso_code2);
   };
-
-  const isExternalUrl = (url: string) => url.startsWith('https://') || url.startsWith('http://');
 
   return (
     <motion.li
