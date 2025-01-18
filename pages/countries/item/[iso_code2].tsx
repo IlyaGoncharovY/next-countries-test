@@ -1,58 +1,75 @@
-import {useRouter} from 'next/router';
+import {GetStaticPaths, GetStaticProps} from "next";
+
 import Image from "next/image";
-import {useEffect, useState} from 'react';
-import {ICountry} from '@/assects/hooks/useCountries';
-import {useCountry} from "@/assects/hooks/useCountry";
+import {motion} from 'framer-motion';
+import {useRouter} from 'next/router';
+
+import {ICountry} from "@/assects/types/types";
+import {CountryAPI} from "@/assects/api/CountryAPI";
 
 import s from './CountryDetails.module.css';
 
-async function fetchCountries(): Promise<ICountry[]> {
-    const res = await fetch(
-        'https://gist.githubusercontent.com/sanchezzzhak/8606e9607396fb5f8216/raw/39de29950198a7332652e1e8224f988b2e94b166/ISO3166_RU.json'
-    );
-    if (!res.ok) {
-        throw new Error('Failed to fetch countries');
-    }
-    return res.json();
+interface CountryDetailsProps {
+    country: ICountry;
 }
 
-export default function CountryDetails() {
-    const router = useRouter();
-    const { iso_code2 } = router.query;
+export const getStaticPaths: GetStaticPaths = async () => {
+    const countries = await CountryAPI.fetchCountries();
 
-    const {country} = useCountry(iso_code2, fetchCountries);
+    const paths = countries.map((country) => ({
+        params: { iso_code2: country.iso_code2 },
+    }));
 
-    const defaultFlagUrl = '/globe.svg';
-    const [currentFlagUrl, setCurrentFlagUrl] = useState<string>(defaultFlagUrl);
-
-    useEffect(() => {
-        if (country?.flag_url) {
-            setCurrentFlagUrl(`https:${country.flag_url}`);
-        }
-    }, [country]);
-    const handleImageError = () => {
-        setCurrentFlagUrl(defaultFlagUrl);
+    return {
+        paths,
+        fallback: false,
     };
+};
+
+export const getStaticProps: GetStaticProps = async ({ params }) => {
+    const { iso_code2 } = params!;
+    const countries = await CountryAPI.fetchCountries();
+    const country = countries.find((c) => c.iso_code2 === iso_code2);
 
     if (!country) {
-        return <p>Loading country details...</p>;
+        return {
+            notFound: true,
+        };
     }
 
+    return {
+        props: {
+            country,
+        },
+    };
+};
+
+const CountryDetails = ({ country }: CountryDetailsProps) => {
+    const router = useRouter();
+    const defaultFlagUrl = '/globe.svg';
+
     return (
-        <div
+        <motion.div
+            initial={{ opacity: 0, x: -200 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 200 }}
+            transition={{ duration: 0.5 }}
             className={s.countryDetailsContainer}
         >
-            <h1>{country.name_ru}</h1>
             <Image
-                src={currentFlagUrl}
-                alt={`${country.name_ru} flag`}
-                width={100}
-                height={100}
-                onError={handleImageError}
+                src={`https:${country.flag_url || defaultFlagUrl}`}
+                alt={`Flag of ${country.name_ru}`}
+                width={40}
+                height={30}
+                className={s.countryFlag}
+                onError={(e) => (e.currentTarget.src = defaultFlagUrl)}
             />
-            <p>ISO Code 2: {country.iso_code2}</p>
-            <p>ISO Code 3: {country.iso_code3}</p>
-            <button onClick={() => router.back()}>Back to list</button>
-        </div>
+            <span className={s.countryName}>{country.name_ru}</span>
+            <button onClick={() => router.back()} className={s.backButton}>
+                Back
+            </button>
+        </motion.div>
     );
 }
+
+export default CountryDetails;

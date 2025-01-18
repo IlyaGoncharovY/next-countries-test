@@ -1,7 +1,7 @@
 import React, {FC, useState} from 'react';
 import Image from "next/image";
 import {motion} from "framer-motion";
-import {ICountry} from "@/assects/hooks/useCountries";
+import {ICountry} from "@/assects/types/types";
 import {useCountry} from "@/assects/hooks/useCountry";
 
 import s from './CountryItem.module.css'
@@ -11,10 +11,30 @@ interface ICountryItem {
     removeCountry: (countryCode: string) => void
 }
 
+/**
+ * Компонент для отображения элемента списка стран.
+ *
+ * @param {ICountry} country - Объект, содержащий данные о стране, такие как название, флаг и коды ISO.
+ * @param {function} removeCountry - Функция для удаления страны из списка. Принимает код страны (ISO 3166-1 alpha-2) в качестве аргумента.
+ *
+ * @example
+ * const country = {
+ *   name_ru: "Россия",
+ *   flag_url: "/path/to/flag",
+ *   iso_code2: "RU",
+ *   iso_code3: "RUS",
+ * };
+ *
+ * const handleRemoveCountry = (code) => {
+ *   console.log(`Удаление страны с кодом: ${code}`);
+ * };
+ *
+ * <CountryItem country={country} removeCountry={handleRemoveCountry} />
+ */
 export const CountryItem: FC<ICountryItem> = ({
                                                   country,
                                                   removeCountry
-                                              }) => {
+                                              }: ICountryItem) => {
     const {handleItemClick} = useCountry(country.iso_code2);
 
     const defaultFlagUrl = '/globe.svg';
@@ -41,7 +61,7 @@ export const CountryItem: FC<ICountryItem> = ({
         >
             <Image
                 src={currentFlagUrl}
-                alt={`Country name:${country.name_ru}`}
+                alt={`Country name: ${country.name_ru}`}
                 width={40}
                 height={30}
                 className={s.countryItemFlag}
