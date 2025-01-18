@@ -13,6 +13,9 @@ const nextConfig: NextConfig = {
     unoptimized: true,
   },
   output: 'export',
+  trailingSlash: true,
+  basePath: '/next-countries-test',
+  assetPrefix: '/next-countries-test',
 };
 
 export default nextConfig;

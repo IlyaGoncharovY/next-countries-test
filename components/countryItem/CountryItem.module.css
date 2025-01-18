@@ -7,6 +7,12 @@
     padding: 10px;
     border-radius: 5px;
     box-shadow: 0 2px 4px var(--color-box-shadow);
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
+
+    &:hover {
+        box-shadow: 6px 6px 6px var(--color-box-shadow);
+        transform: translateY(-2px);
+    }
 
     .countryItemFlag {
         margin-right: 10px;
