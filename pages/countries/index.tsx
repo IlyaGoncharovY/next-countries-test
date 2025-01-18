@@ -1,54 +1,66 @@
-// import {Geist, Geist_Mono} from "next/font/google";
-import s from './Countries.module.css';
+import {useEffect} from 'react';
+import {GetStaticProps} from 'next';
 import {AnimatePresence} from 'framer-motion';
-import {ICountry, useCountries} from "@/assects/hooks/useCountries";
-import {CountryItem} from "@/components/countryItem/CountryItem";
-import {HeadMeta} from "@/components/headMeta/HeadMeta";
-import {getLayout} from "@/components/layout/Layout";
 
-// const geistSans = Geist({
-//     variable: "--font-geist-sans",
-//     subsets: ["latin"],
-// });
-//
-// const geistMono = Geist_Mono({
-//     variable: "--font-geist-mono",
-//     subsets: ["latin"],
-// });
+import s from './Countries.module.css';
 
+import {ICountry} from '@/assects/types/types';
+import {CountryAPI} from '@/assects/api/CountryAPI';
+import {getLayout} from '@/components/layout/Layout';
+import {HeadMeta} from '@/components/headMeta/HeadMeta';
+import {CountryItem} from '@/components/countryItem/CountryItem';
+import {useCountriesContext} from '@/contexts/CountriesContext';
 
-async function fetchCountries(): Promise<ICountry[]> {
-    const res = await fetch(
-        'https://gist.githubusercontent.com/sanchezzzhak/8606e9607396fb5f8216/raw/39de29950198a7332652e1e8224f988b2e94b166/ISO3166_RU.json'
-    );
-    if (!res.ok) {
-        throw new Error('Failed to fetch countries');
+export const getStaticProps: GetStaticProps = async () => {
+
+  const initialCountryList: ICountry[] = await CountryAPI.fetchCountries();
+
+  return {
+    props: {
+      initialCountryList,
+    },
+  };
+};
+
+interface CountriesProps {
+    initialCountryList: ICountry[];
+}
+
+const Countries = ({initialCountryList}: CountriesProps ) => {
+
+  const {countryList, setCountryList} = useCountriesContext();
+
+  useEffect(() => {
+    if (!countryList) {
+      setCountryList(initialCountryList);
     }
-    return res.json();
-}
+  }, [countryList, initialCountryList, setCountryList]);
 
-function Countries() {
+  const removeCountry = (code: string) => {
+    setCountryList((prev) => {
+      if (!prev) return prev;
+      return prev.filter((country) => country.iso_code2 !== code);
+    });
+  };
 
-    const {countryList, removeCountry} = useCountries(fetchCountries);
-
-    return (
-        <>
-            <HeadMeta title={'Countries'} content={'Countries list'}/>
-            <h1 className={s.countriesContainerTitle}>Country List</h1>
-            <ul className={s.countriesList}>
-                <AnimatePresence>
-                    {countryList.map((country) => (
-                        <CountryItem
-                            key={country.iso_code2}
-                            country={country}
-                            removeCountry={removeCountry}
-                        />
-                    ))}
-                </AnimatePresence>
-            </ul>
-        </>
-    );
-}
+  return (
+    <>
+      <HeadMeta title={'Countries'} content={'Countries list'}/>
+      <h1 className={s.countriesContainerTitle}>Country List</h1>
+      <ul className={s.countriesList}>
+        <AnimatePresence>
+          {countryList && countryList.map((country) => (
+            <CountryItem
+              key={country.iso_code2}
+              country={country}
+              removeCountry={removeCountry}
+            />
+          ))}
+        </AnimatePresence>
+      </ul>
+    </>
+  );
+};
 
 Countries.getLayout = getLayout;
 export default Countries;

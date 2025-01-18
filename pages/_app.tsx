@@ -1,9 +1,11 @@
-import "@/styles/globals.css";
-import type { ReactElement, ReactNode } from 'react'
-import type { NextPage } from 'next'
-import type { AppProps } from 'next/app'
+import '@/styles/globals.css';
+import type { ReactElement, ReactNode } from 'react';
+import type { NextPage } from 'next';
+import type { AppProps } from 'next/app';
 
-export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
+import {CountriesProvider} from '@/contexts/CountriesContext';
+
+export type NextPageWithLayout<P = object, IP = P> = NextPage<P, IP> & {
   getLayout?: (page: ReactElement) => ReactNode
 }
 
@@ -13,7 +15,11 @@ type AppPropsWithLayout = AppProps & {
 
 export default function MyApp({ Component, pageProps }: AppPropsWithLayout) {
   // Use the layout defined at the page level, if available
-  const getLayout = Component.getLayout ?? ((page) => page)
+  const getLayout = Component.getLayout ?? ((page) => page);
 
-  return getLayout(<Component {...pageProps} />)
+  return getLayout(
+    <CountriesProvider>
+      <Component {...pageProps} />
+    </CountriesProvider>,
+  );
 }
