@@ -16,9 +16,9 @@ const nextConfig: NextConfig = {
   trailingSlash: true,
   basePath: '/next-countries-test',
   assetPrefix: '/next-countries-test',
-  publicRuntimeConfig: {
-    basePath: '/next-countries-test',
-  },
+  // publicRuntimeConfig: {
+  //   basePath: '/next-countries-test',
+  // },
 };
 
 export default nextConfig;
